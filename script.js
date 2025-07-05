@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         snake.unshift(head);
 
-        if (head.x === food.x && head.y === food.y) {
+        if (food && head.x === food.x && head.y === food.y) {
             score++;
             difficultyCounter++;
             snake[0].isFood = true;
@@ -202,7 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const goingLeft = direction.x === -1;
         const goingRight = direction.x === 1;
 
-        if (snake.length === 1 && (e.key === 'ArrowLeft' || e.key === 'a')) return;
+        // BUG FIX: Removida a linha que impedia o início do jogo movendo para a esquerda.
+        // if (snake.length === 1 && (e.key === 'ArrowLeft' || e.key === 'a')) return;
 
         switch (e.key) {
             case 'ArrowUp': case 'w':
@@ -238,7 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function dPadHandler(e) {
         e.preventDefault();
-        const key = e.currentTarget.dataset.key;
+        // BUG FIX: Alterado e.currentTarget para e.target para obter o elemento correto (o botão).
+        const key = e.target.dataset.key;
         if (key) {
             handleKeydown({ key: key });
         }
