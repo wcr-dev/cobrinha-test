@@ -24,13 +24,18 @@
 
     <!-- Modal que conterá o jogo -->
     <div id="game-modal" class="modal">
-        <canvas id="game-canvas"></canvas>
-        <!-- Controles Virtuais para Mobile (D-Pad) -->
-        <div id="d-pad">
-            <button id="up-btn" class="d-pad-btn" data-key="ArrowUp">▲</button>
-            <button id="left-btn" class="d-pad-btn" data-key="ArrowLeft">◄</button>
-            <button id="right-btn" class="d-pad-btn" data-key="ArrowRight">►</button>
-            <button id="down-btn" class="d-pad-btn" data-key="ArrowDown">▼</button>
+        <!-- Área dedicada para o canvas do jogo -->
+        <div id="game-area">
+            <canvas id="game-canvas"></canvas>
+        </div>
+        <!-- Área dedicada para os controles virtuais -->
+        <div id="controls-area">
+            <div id="d-pad">
+                <button class="d-pad-btn" data-key="ArrowUp">▲</button>
+                <button class="d-pad-btn" data-key="ArrowLeft">◄</button>
+                <button class="d-pad-btn" data-key="ArrowRight">►</button>
+                <button class="d-pad-btn" data-key="ArrowDown">▼</button>
+            </div>
         </div>
     </div>
 
