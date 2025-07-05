@@ -13,7 +13,7 @@ body {
     margin: 0;
     text-align: center;
     overflow: hidden; /* Evita barras de rolagem */
-    touch-action: none; /* Previne ações de toque padrão do navegador, como "puxar para atualizar" */
+    touch-action: none; /* Previne ações de toque padrão do navegador */
 }
 
 /* Contêiner principal para as telas */
@@ -27,18 +27,17 @@ body {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-/* Mostra a tela que estiver ativa */
 .screen.active {
     display: flex;
 }
 
 h1 {
-    color: #4d94ff; /* Azul */
+    color: #4d94ff;
     margin-bottom: 1.5rem;
 }
 
 h2 {
-    color: #ffcc00; /* Amarelo */
+    color: #ffcc00;
     font-size: 1rem;
     margin-bottom: 1rem;
 }
@@ -100,7 +99,8 @@ h2 {
     border-bottom: none;
 }
 
-/* Modal do jogo */
+/* --- Layout do Jogo --- */
+
 .modal {
     position: fixed;
     top: 5%;
@@ -109,8 +109,7 @@ h2 {
     height: 90vh;
     background-color: #000;
     display: none; /* Escondido por padrão */
-    justify-content: center;
-    align-items: center;
+    flex-direction: column; /* Organiza a área do jogo e os controles verticalmente */
     border: 5px solid #4d94ff;
     border-radius: 10px;
     box-shadow: 0 0 30px #4d94ff;
@@ -120,12 +119,26 @@ h2 {
     display: flex;
 }
 
-/* Canvas do jogo */
-#game-canvas {
+#game-area {
+    flex-grow: 1; /* Faz a área do jogo ocupar todo o espaço disponível */
+    position: relative; /* Para posicionar o canvas dentro dela */
     background-color: #0d0d0d;
-    display: block;
+}
+
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+}
+
+#controls-area {
+    display: none; /* Escondida por padrão (para desktop) */
+    background-color: #1c1c1c;
+    justify-content: center;
+    align-items: center;
+    border-top: 3px solid #4d94ff;
 }
 
 /* Mensagem de ranking */
@@ -135,29 +148,26 @@ h2 {
     font-size: 0.9rem;
 }
 
-/* --- ESTILOS DO D-PAD VIRTUAL --- */
+/* --- D-PAD VIRTUAL --- */
+
+/* Em dispositivos com tela de toque, mostra a área de controles e ajusta a área do jogo */
+@media (pointer: coarse) {
+    #game-area {
+        flex-basis: 75%; /* Área do jogo ocupa 75% da altura */
+    }
+    #controls-area {
+        display: flex;
+        flex-basis: 25%; /* Área de controles ocupa 25% */
+    }
+}
+
 #d-pad {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
     display: grid;
     grid-template-areas:
         ". up ."
         "left . right"
         ". down .";
     gap: 15px;
-    opacity: 0; /* Escondido por padrão */
-    pointer-events: none; /* O contêiner não intercepta toques */
-    transition: opacity 0.3s ease-in-out;
-}
-
-/* Mostra o D-pad apenas em dispositivos com tela de toque */
-@media (pointer: coarse) {
-    #game-modal.active #d-pad {
-        opacity: 1;
-        pointer-events: auto; /* Permite toques no D-pad quando visível */
-    }
 }
 
 .d-pad-btn {
@@ -172,9 +182,8 @@ h2 {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    pointer-events: auto; /* Garante que os botões sempre possam ser tocados */
-    user-select: none; /* Evita seleção de texto no botão */
-    -webkit-tap-highlight-color: transparent; /* Remove o destaque de toque no iOS */
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .d-pad-btn:active {
@@ -182,7 +191,8 @@ h2 {
     transform: scale(0.95);
 }
 
-#up-btn { grid-area: up; }
-#left-btn { grid-area: left; }
-#right-btn { grid-area: right; }
-#down-btn { grid-area: down; }
+/* Mapeamento dos botões para as áreas do grid */
+#d-pad button:nth-child(1) { grid-area: up; }
+#d-pad button:nth-child(2) { grid-area: left; }
+#d-pad button:nth-child(3) { grid-area: right; }
+#d-pad button:nth-child(4) { grid-area: down; }
