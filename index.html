@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Cobrinha</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Importa a biblioteca Tone.js para o áudio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+</head>
+<body>
+
+    <!-- Tela inicial com o botão de start e as pontuações -->
+    <div id="start-screen" class="screen active">
+        <h1>Jogo da Cobrinha</h1>
+        <div class="scores-container">
+            <h2>Melhores Pontuações (Sessão)</h2>
+            <ul id="high-scores">
+                <li>Nenhuma pontuação ainda.</li>
+            </ul>
+        </div>
+        <button id="start-btn" class="btn">Start</button>
+    </div>
+
+    <!-- Modal que conterá o jogo -->
+    <div id="game-modal" class="modal">
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- Tela de Game Over -->
+    <div id="game-over-screen" class="screen">
+        <h1>Fim de Jogo!</h1>
+        <p>Sua pontuação final foi: <span id="final-score">0</span></p>
+        <p id="rank-message"></p>
+        <div class="button-group">
+            <button id="restart-btn" class="btn">Recomeçar</button>
+            <button id="exit-btn" class="btn">Sair</button>
+        </div>
+    </div>
+
+    <!-- Link para o arquivo JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
+
