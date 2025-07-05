@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const rankMessage = document.getElementById('rank-message');
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
+    // Referências aos botões do D-pad
+    const upBtn = document.getElementById('up-btn');
+    const downBtn = document.getElementById('down-btn');
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
 
     // Constantes e variáveis do jogo
     const GRID_SIZE = 20; // Tamanho de cada "pixel" do jogo
@@ -21,12 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let snake, food, direction, score, gameOver, gameInterval, speed;
     let highScores = [];
     let difficultyCounter = 0;
-
-    // Variáveis para controle de toque (mobile)
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
 
     // --- Lógica de Áudio com Tone.js ---
     const synth = new Tone.Synth({
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         // Reseta o estado do jogo
         snake = [{ x: 10, y: 10, color: HEAD_COLOR, isFood: false }];
-        generateFood();
         direction = { x: 0, y: 0 };
         score = 1;
         gameOver = false;
@@ -60,10 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Atualiza a interface
         startScreen.classList.remove('active');
         gameOverScreen.classList.remove('active');
+        gameModal.classList.add('active'); // Adiciona classe para controlar visibilidade do D-pad
         gameModal.style.display = 'flex';
 
-        // Redimensiona o canvas para o tamanho do modal
+        // Redimensiona o canvas e gera a primeira comida
         resizeCanvas();
+        generateFood();
 
         // Inicia o loop do jogo e a música
         if (gameInterval) clearInterval(gameInterval);
@@ -80,6 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Atualiza o estado do jogo (movimento, colisões)
     function update() {
+        if (direction.x === 0 && direction.y === 0) return; // Não move se nenhuma direção foi escolhida
+
         const head = { ...snake[0] }; // Copia a cabeça atual
         head.x += direction.x;
         head.y += direction.y;
@@ -117,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             generateFood();
             
             // Aumenta a dificuldade a cada 10 frutas
-            if (difficultyCounter % 10 === 0) {
+            if (difficultyCounter > 0 && difficultyCounter % 10 === 0) {
                 speed *= 0.9; // Aumenta a velocidade em 10%
                 clearInterval(gameInterval);
                 gameInterval = setInterval(gameLoop, speed);
@@ -146,17 +148,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Desenha a fruta
-        ctx.fillStyle = FOOD_COLOR;
-        ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
-        // Efeito de brilho na fruta
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.fillRect(food.x * GRID_SIZE + 2, food.y * GRID_SIZE + 2, GRID_SIZE / 3, GRID_SIZE / 3);
+        if (food) {
+            ctx.fillStyle = FOOD_COLOR;
+            ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+            // Efeito de brilho na fruta
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillRect(food.x * GRID_SIZE + 2, food.y * GRID_SIZE + 2, GRID_SIZE / 3, GRID_SIZE / 3);
+        }
     }
 
     // Gera uma nova fruta em uma posição aleatória
     function generateFood() {
         const gridWidth = Math.floor(canvas.width / GRID_SIZE);
         const gridHeight = Math.floor(canvas.height / GRID_SIZE);
+        if (gridWidth <= 0 || gridHeight <= 0) return; // Não gera comida se o canvas não tem tamanho
+        
         let foodPosition;
         do {
             foodPosition = {
@@ -177,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHighScores();
         finalScoreSpan.textContent = score;
         gameModal.style.display = 'none';
+        gameModal.classList.remove('active');
         gameOverScreen.classList.add('active');
     }
 
@@ -223,6 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const goingLeft = direction.x === -1;
         const goingRight = direction.x === 1;
 
+        // Não permite o primeiro movimento na direção oposta de onde a cobra crescerá
+        if (snake.length === 1) {
+            if (e.key === 'ArrowLeft') return;
+        }
+
         switch (e.key) {
             case 'ArrowUp':
             case 'w':
@@ -242,36 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
         }
     }
-
-    // Funções para controle de toque
-    function handleTouchStart(e) {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
-    }
-
-    function handleTouchEnd(e) {
-        touchEndX = e.changedTouches[0].screenX;
-        touchEndY = e.changedTouches[0].screenY;
-        handleSwipe();
-    }
-
-    function handleSwipe() {
-        const dx = touchEndX - touchStartX;
-        const dy = touchEndY - touchStartY;
-        const absDx = Math.abs(dx);
-        const absDy = Math.abs(dy);
-
-        // Verifica se o movimento foi mais horizontal ou vertical
-        if (Math.max(absDx, absDy) > 20) { // Limite mínimo para detectar swipe
-            const event = { key: '' };
-            if (absDx > absDy) {
-                event.key = dx > 0 ? 'ArrowRight' : 'ArrowLeft';
-            } else {
-                event.key = dy > 0 ? 'ArrowDown' : 'ArrowUp';
-            }
-            handleKeydown(event);
-        }
-    }
     
     // --- Redimensionamento ---
     function resizeCanvas() {
@@ -280,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.height = modalRect.height;
         // Se um jogo estiver em andamento, redesenhe
         if (!gameOver && snake) {
-           generateFood(); // Gera nova comida para garantir que está dentro dos limites
            draw();
         }
     }
@@ -289,11 +270,22 @@ document.addEventListener('DOMContentLoaded', () => {
     startBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', startGame);
     exitBtn.addEventListener('click', exitGame);
+    
+    // Listener para teclado (Desktop)
     document.addEventListener('keydown', handleKeydown);
     
-    // Listeners de toque para mobile
-    canvas.addEventListener('touchstart', handleTouchStart, false);
-    canvas.addEventListener('touchend', handleTouchEnd, false);
+    // Listeners para o D-pad virtual (Mobile)
+    function dPadHandler(e) {
+        e.preventDefault(); // Previne comportamento padrão do toque (zoom, scroll)
+        const key = e.currentTarget.dataset.key;
+        handleKeydown({ key: key });
+    }
+
+    // Usar 'touchstart' para resposta mais rápida no mobile
+    upBtn.addEventListener('touchstart', dPadHandler, { passive: false });
+    downBtn.addEventListener('touchstart', dPadHandler, { passive: false });
+    leftBtn.addEventListener('touchstart', dPadHandler, { passive: false });
+    rightBtn.addEventListener('touchstart', dPadHandler, { passive: false });
     
     // Listener para redimensionar a janela
     window.addEventListener('resize', resizeCanvas);
@@ -301,4 +293,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializa a exibição das pontuações
     updateHighScoresDisplay();
 });
-
