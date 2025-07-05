@@ -13,6 +13,7 @@ body {
     margin: 0;
     text-align: center;
     overflow: hidden; /* Evita barras de rolagem */
+    touch-action: none; /* Previne ações de toque padrão do navegador, como "puxar para atualizar" */
 }
 
 /* Contêiner principal para as telas */
@@ -115,6 +116,10 @@ h2 {
     box-shadow: 0 0 30px #4d94ff;
 }
 
+.modal.active {
+    display: flex;
+}
+
 /* Canvas do jogo */
 #game-canvas {
     background-color: #0d0d0d;
@@ -130,3 +135,54 @@ h2 {
     font-size: 0.9rem;
 }
 
+/* --- ESTILOS DO D-PAD VIRTUAL --- */
+#d-pad {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-areas:
+        ". up ."
+        "left . right"
+        ". down .";
+    gap: 15px;
+    opacity: 0; /* Escondido por padrão */
+    pointer-events: none; /* O contêiner não intercepta toques */
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Mostra o D-pad apenas em dispositivos com tela de toque */
+@media (pointer: coarse) {
+    #game-modal.active #d-pad {
+        opacity: 1;
+        pointer-events: auto; /* Permite toques no D-pad quando visível */
+    }
+}
+
+.d-pad-btn {
+    width: 65px;
+    height: 65px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    color: white;
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    pointer-events: auto; /* Garante que os botões sempre possam ser tocados */
+    user-select: none; /* Evita seleção de texto no botão */
+    -webkit-tap-highlight-color: transparent; /* Remove o destaque de toque no iOS */
+}
+
+.d-pad-btn:active {
+    background-color: rgba(255, 255, 255, 0.5);
+    transform: scale(0.95);
+}
+
+#up-btn { grid-area: up; }
+#left-btn { grid-area: left; }
+#right-btn { grid-area: right; }
+#down-btn { grid-area: down; }
