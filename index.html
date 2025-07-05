@@ -25,6 +25,13 @@
     <!-- Modal que conterá o jogo -->
     <div id="game-modal" class="modal">
         <canvas id="game-canvas"></canvas>
+        <!-- Controles Virtuais para Mobile (D-Pad) -->
+        <div id="d-pad">
+            <button id="up-btn" class="d-pad-btn" data-key="ArrowUp">▲</button>
+            <button id="left-btn" class="d-pad-btn" data-key="ArrowLeft">◄</button>
+            <button id="right-btn" class="d-pad-btn" data-key="ArrowRight">►</button>
+            <button id="down-btn" class="d-pad-btn" data-key="ArrowDown">▼</button>
+        </div>
     </div>
 
     <!-- Tela de Game Over -->
@@ -42,4 +49,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
